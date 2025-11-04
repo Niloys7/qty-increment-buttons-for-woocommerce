@@ -6,6 +6,8 @@ if ( ! defined( 'WPINC' ) ) die;
 // Create feedback notice class.
 class qib_notice {
 
+	public $dismiss_notice;
+
 	public function __construct() {
 		
 		$this->dismiss_notice = get_option( 'qib_dismiss_notice', false );
@@ -107,7 +109,7 @@ class qib_notice {
 		}
 		";
 		
-		echo '<style>' . $my_style . '</style>';
+		echo '<style>' . $my_style . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped	
 	}
 	
 }

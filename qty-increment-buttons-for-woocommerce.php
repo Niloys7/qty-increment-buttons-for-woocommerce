@@ -2,22 +2,36 @@
 /*
  * Plugin Name: Qty Increment Buttons for WooCommerce
  * Description: Adds professionally looking "-" and "+" buttons around product quantity field, on product and cart page.
- * Version: 2.7.5
- * Author: taisho
+ * Version: 2.7.6
+ * Author: Codeixer
  * WC requires at least: 3.0.0
- * WC tested up to: 4.4.1
+ * WC tested up to: 10.3
+ * Requires Plugins: woocommerce
+ * Domain Path:       /languages
+ * License: GPLv3
+ * License URL: http://www.gnu.org/licenses/gpl-3.0.html
  */
  
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) die;
-
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, false );
+		}
+	}
+);
 register_activation_hook( __FILE__, 'qib_activate' );
 function qib_activate() {  
 	// Prevent plugin activation if the minimum PHP version requirement is not met.
 	if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 		deactivate_plugins( basename( __FILE__ ) );
-		$msg = '<p><strong>Qty Increment Buttons for WooCommerce</strong> requires PHP version 5.4 or greater. Your server runs ' . PHP_VERSION . '.</p>';
-		wp_die( $msg, 'Plugin Activation Error',  array( 'response' => 200, 'back_link' => TRUE ) );
+		$msg = '<p><strong>Qty Increment Buttons for WooCommerce</strong> requires PHP version 7.4 or greater. Your server runs ' . PHP_VERSION . '.</p>';
+		wp_die( esc_html( $msg ), 'Plugin Activation Error',  array( 'response' => 200, 'back_link' => TRUE ) );
 	}
 	// Store time of first plugin activation (add_option does nothing if the option already exists).
 	add_option( 'qib_first_activate', time());
@@ -29,6 +43,8 @@ class qib_settings {
 	private $options;	
 	private $settings_page_name;
 	private $settings_menu_name;
+	public $settings_list;
+	public $plugin_hook_suffix;
 
     public function __construct() {
 		
@@ -51,44 +67,104 @@ class qib_settings {
 		}
 		
 		$this->settings_list = [
-			
-			'qib_all_pages' 			=> [ 'val' => false, 	'title' => __( 'Load on all pages', 'qty-increment-buttons-for-woocommerce' ), 	'type' => 'checkbox', 	'tab' => 'configuration',
-											 'descr' => __( 'Check if the plugin doesn\'t work correctly on your website out of the box.', 'qty-increment-buttons-for-woocommerce' ),
-											 'info' => __( 'Turn this setting on to enable the plugin on pages other than product, cart, checkout, shop, category and correctly display Quick Views initiated from these pages.', 'qty-increment-buttons-for-woocommerce' ),
-											 'tip' => true],
-			'qib_archive_display' 		=> [ 'val' => __( 'None', 'qty-increment-buttons-for-woocommerce' ), 	'title' => __( 'Archives display', 'qty-increment-buttons-for-woocommerce' ),		'type' => 'select', 	'tab' => 'configuration',
-											 'descr' => __( 'Archive pages that should display quantity input field and increment buttons. Doesn\'t affect variable products and products sold individually.', 'qty-increment-buttons-for-woocommerce' ),
-											 'options' => [ __( 'None', 'qty-increment-buttons-for-woocommerce' ), __( 'Shop', 'qty-increment-buttons-for-woocommerce' ), __( 'Category', 'qty-increment-buttons-for-woocommerce' ), __( 'Shop & Category', 'qty-increment-buttons-for-woocommerce' ) ],
-											 'tip' => true ],
-			'qib_archive_after' 		=> [ 'val' => __( 'Before Add to cart', 'qty-increment-buttons-for-woocommerce' ), 'title' => __( 'Archive position', 'qty-increment-buttons-for-woocommerce' ), 	'type' => 'select', 'tab' => 'configuration',
-											 'descr' => __( 'Position of quantity input field and increment buttons in HTML structure of archives. Visual position may be different depending on float. "After Add to cart" is the only way to keep all these elements in one line on some themes.', 'qty-increment-buttons-for-woocommerce' ),									
-											 'options' => [ __( 'Before Add to cart', 'qty-increment-buttons-for-woocommerce' ), __( 'After Add to cart', 'qty-increment-buttons-for-woocommerce' ) ],
-											 'arg' => ( is_bool( get_option( 'qib_settingz' ) ) || get_option( 'qib_settingz' )['qib_archive_display'] == 'None' ) ? [ 'class' => 'hidden' ] : null,
-											 'tip' => true ],
-			'qib_auto_table' 			=> [ 'val' => false, 	'title' => __( 'Auto cart columns', 'qty-increment-buttons-for-woocommerce' ), 	'type' => 'checkbox', 	'tab' => 'configuration',
-											 'descr' => __( 'Check if you notice buttons overflowing to next column or breaking to next line on the cart page.', 'qty-increment-buttons-for-woocommerce' ),
-											 'info' => __( 'Auto sizes columns on the cart page. Already used by a vast majority of themes. Alternatively merge buttons and reduce widths to fit into fixed-size column.', 'qty-increment-buttons-for-woocommerce' ),
-											 'tip' => true ],
-			'qib_merge_buttons' 		=> [ 'val' => true, 	'title' => __( 'Merge buttons', 'qty-increment-buttons-for-woocommerce' ), 		'type' => 'checkbox', 	'tab' => 'configuration',
-											 'descr' => __( 'Remove space between increment buttons and quantity input field, visually merging these elements.', 'qty-increment-buttons-for-woocommerce' ) ],											
-			'qib_cart_align' 			=> [ 'val' => __( 'Center', 'qty-increment-buttons-for-woocommerce' ), 'title' => __( 'Cart page align', 'qty-increment-buttons-for-woocommerce' ),		'type' => 'select', 	'tab' => 'configuration',
-											 'descr' => __( 'Horizontal alignment in cart page quantity column. Affects input field and increment buttons. Desktop view only.', 'qty-increment-buttons-for-woocommerce' ),
-											 'options' => [ __( 'Left', 'qty-increment-buttons-for-woocommerce' ), __( 'Center', 'qty-increment-buttons-for-woocommerce' ), __( 'Right', 'qty-increment-buttons-for-woocommerce' ) ],
-											 'tip' => true ],
-			'qib_button_style' 			=> [ 'val' => __( 'Silver', 'qty-increment-buttons-for-woocommerce' ), 'title' => __( 'Button style', 'qty-increment-buttons-for-woocommerce' ), 			'type' => 'select', 	'tab' => 'configuration',
-											 'descr' => __( 'Includes button colors (background, font, hover background, focus outline), button styles (focus outline) and quantity input field colors (border). You can adjust this style within your child theme CSS or additional CSS if your theme allows it.', 'qty-increment-buttons-for-woocommerce' ),											 
-											 'options' => [ __( 'Black', 'qty-increment-buttons-for-woocommerce' ), __( 'Blue', 'qty-increment-buttons-for-woocommerce' ), __( 'Brown', 'qty-increment-buttons-for-woocommerce' ), __( 'Orange', 'qty-increment-buttons-for-woocommerce' ), __( 'Red', 'qty-increment-buttons-for-woocommerce' ), __( 'Silver', 'qty-increment-buttons-for-woocommerce' ) ],
-											 'tip' => true ],											 
-			'qib_button_height' 		=> [ 'val' => 35, 		'title' => __( 'Button height', 'qty-increment-buttons-for-woocommerce' ), 		'type' => 'number', 	'tab' => 'configuration',
-											 'descr' => __( 'Recommended 25-40 pixels. Quantity input field and Add to cart button will have the same height.', 'qty-increment-buttons-for-woocommerce' ),
-											 'arg' => [ 'class' => 'qib_sizes' ] ],
-			'qib_button_width' 			=> [ 'val' => 30, 		'title' => __( 'Button width', 'qty-increment-buttons-for-woocommerce' ), 		'type' => 'number', 	'tab' => 'configuration',
-											 'descr' => __( 'Recommended 25-40 pixels.', 'qty-increment-buttons-for-woocommerce' ),
-											 'arg' => [ 'class' => 'qib_sizes' ] ],
-			'qib_quantity_width' 	=> 	   [ 'val' => 45, 		'title' => __( 'Quantity field width', 'qty-increment-buttons-for-woocommerce' ),'type' => 'number', 	'tab' => 'configuration',
-											 'descr' => __( 'Recommended 35-50 pixels.', 'qty-increment-buttons-for-woocommerce' ),
-											 'arg' => [ 'class' => 'qib_sizes' ] ],
-		];
+
+	'qib_all_pages' => [
+		'val'   => false,
+		'title' => 'Load on all pages',
+		'type'  => 'checkbox',
+		'tab'   => 'configuration',
+		'descr' => 'Check if the plugin doesn\'t work correctly on your website out of the box.',
+		'info'  => 'Turn this setting on to enable the plugin on pages other than product, cart, checkout, shop, category and correctly display Quick Views initiated from these pages.',
+		'tip'   => true
+	],
+
+	'qib_archive_display' => [
+		'val'     => 'None',
+		'title'   => 'Archives display',
+		'type'    => 'select',
+		'tab'     => 'configuration',
+		'descr'   => 'Archive pages that should display quantity input field and increment buttons. Doesn\'t affect variable products and products sold individually.',
+		'options' => [ 'None', 'Shop', 'Category', 'Shop & Category' ],
+		'tip'     => true
+	],
+
+	'qib_archive_after' => [
+		'val'     => 'Before Add to cart',
+		'title'   => 'Archive position',
+		'type'    => 'select',
+		'tab'     => 'configuration',
+		'descr'   => 'Position of quantity input field and increment buttons in HTML structure of archives. Visual position may be different depending on float. "After Add to cart" is the only way to keep all these elements in one line on some themes.',
+		'options' => [ 'Before Add to cart', 'After Add to cart' ],
+		'arg'     => ( is_bool( get_option( 'qib_settingz' ) ) || get_option( 'qib_settingz' )['qib_archive_display'] == 'None' ) ? [ 'class' => 'hidden' ] : null,
+		'tip'     => true
+	],
+
+	'qib_auto_table' => [
+		'val'   => false,
+		'title' => 'Auto cart columns',
+		'type'  => 'checkbox',
+		'tab'   => 'configuration',
+		'descr' => 'Check if you notice buttons overflowing to next column or breaking to next line on the cart page.',
+		'info'  => 'Auto sizes columns on the cart page. Already used by a vast majority of themes. Alternatively merge buttons and reduce widths to fit into fixed-size column.',
+		'tip'   => true
+	],
+
+	'qib_merge_buttons' => [
+		'val'   => true,
+		'title' => 'Merge buttons',
+		'type'  => 'checkbox',
+		'tab'   => 'configuration',
+		'descr' => 'Remove space between increment buttons and quantity input field, visually merging these elements.'
+	],
+
+	'qib_cart_align' => [
+		'val'     => 'Center',
+		'title'   => 'Cart page align',
+		'type'    => 'select',
+		'tab'     => 'configuration',
+		'descr'   => 'Horizontal alignment in cart page quantity column. Affects input field and increment buttons. Desktop view only.',
+		'options' => [ 'Left', 'Center', 'Right' ],
+		'tip'     => true
+	],
+
+	'qib_button_style' => [
+		'val'     => 'Silver',
+		'title'   => 'Button style',
+		'type'    => 'select',
+		'tab'     => 'configuration',
+		'descr'   => 'Includes button colors (background, font, hover background, focus outline), button styles (focus outline) and quantity input field colors (border). You can adjust this style within your child theme CSS or additional CSS if your theme allows it.',
+		'options' => [ 'Black', 'Blue', 'Brown', 'Orange', 'Red', 'Silver' ],
+		'tip'     => true
+	],
+
+	'qib_button_height' => [
+		'val'   => 35,
+		'title' => 'Button height',
+		'type'  => 'number',
+		'tab'   => 'configuration',
+		'descr' => 'Recommended 25-40 pixels. Quantity input field and Add to cart button will have the same height.',
+		'arg'   => [ 'class' => 'qib_sizes' ]
+	],
+
+	'qib_button_width' => [
+		'val'   => 30,
+		'title' => 'Button width',
+		'type'  => 'number',
+		'tab'   => 'configuration',
+		'descr' => 'Recommended 25-40 pixels.',
+		'arg'   => [ 'class' => 'qib_sizes' ]
+	],
+
+	'qib_quantity_width' => [
+		'val'   => 45,
+		'title' => 'Quantity field width',
+		'type'  => 'number',
+		'tab'   => 'configuration',
+		'descr' => 'Recommended 35-50 pixels.',
+		'arg'   => [ 'class' => 'qib_sizes' ]
+	],
+];
+
 	}
 	   
 	public function display_options() {
@@ -135,7 +211,7 @@ class qib_settings {
 	
 	public function add_settings_link( $links ) {
 		$links = array_merge( [
-			'<a href="' . esc_url( admin_url( '/options-general.php?page=' . $this->settings_page_name ) ) . '">' . __( 'Settings' ) . '</a>'
+			'<a href="' . esc_url( admin_url( '/options-general.php?page=' . $this->settings_page_name ) ) . '">' . __( 'Settings','qty-increment-buttons-for-woocommerce' ) . '</a>'
 		], $links );
 		return $links;
 	}
@@ -263,10 +339,10 @@ class qib_settings {
 					</fieldset>';			
 
 				printf (
-					$fieldset,
+					$fieldset, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_attr( $field ),
 					isset( $this->options[$field] ) && ( 1 == $this->options[$field] )  ? 'checked="checked" ':'',
-					$this->settings_list[$field]['descr']
+					$this->settings_list[$field]['descr'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				);			
 				break;
 				
@@ -304,10 +380,10 @@ class qib_settings {
 				$descr = isset ( $this->settings_list[$field]['descr'] ) ? $this->settings_list[$field]['descr'] : '';
 			
 				printf (
-					$fieldset,
+					$fieldset, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_attr( $field ),
 					isset( $this->options[$field] ) ? esc_attr( $this->options[$field]) : '',
-					$descr
+					$descr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				);			
 				break;
 		}	
@@ -381,7 +457,7 @@ if( is_admin() ) {
 		}
 		';	
 		
-		echo '<style>' . qib_minify($my_style) . '</style>';
+		echo '<style>' . qib_minify($my_style) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		
 	}
 
@@ -392,7 +468,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		
 	// Remove plugin prefix and dash "_" from argument keys.
 	function qib_replaceArrayKeys( $array ) {
-		$replacedKeys = str_replace('qib_', null, array_keys( $array ));
+		$replacedKeys = str_replace('qib_', '', array_keys( $array ));
 		return array_combine( $replacedKeys, $array );
 	}	
 	$args = qib_replaceArrayKeys ( $qib_settingz_page->qib_get_settings() );
@@ -804,7 +880,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		}
 		";
 	
-		echo '<style>' . qib_minify($my_style) . '</style>';
+		echo '<style>' . qib_minify($my_style) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	
 	}
 }

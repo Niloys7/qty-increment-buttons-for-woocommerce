@@ -1,0 +1,190 @@
+# Copyright (C) 2025 Codeixer
+# This file is distributed under the same license as the Qty Increment Buttons for WooCommerce plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Qty Increment Buttons for WooCommerce 2.7.6\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/qty-increment-buttons-for-woocommerce\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-11-04T09:42:43+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: qty-increment-buttons-for-woocommerce\n"
+
+#. Plugin Name of the plugin
+#: qty-increment-buttons-for-woocommerce.php
+msgid "Qty Increment Buttons for WooCommerce"
+msgstr ""
+
+#. Description of the plugin
+#: qty-increment-buttons-for-woocommerce.php
+msgid "Adds professionally looking \"-\" and \"+\" buttons around product quantity field, on product and cart page."
+msgstr ""
+
+#. Author of the plugin
+#: qty-increment-buttons-for-woocommerce.php
+msgid "Codeixer"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:57
+msgid "Load on all pages"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:58
+msgid "Check if the plugin doesn't work correctly on your website out of the box."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:59
+msgid "Turn this setting on to enable the plugin on pages other than product, cart, checkout, shop, category and correctly display Quick Views initiated from these pages."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:61
+#: qty-increment-buttons-for-woocommerce.php:63
+msgid "None"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:61
+msgid "Archives display"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:62
+msgid "Archive pages that should display quantity input field and increment buttons. Doesn't affect variable products and products sold individually."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:63
+msgid "Shop"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:63
+msgid "Category"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:63
+msgid "Shop & Category"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:65
+#: qty-increment-buttons-for-woocommerce.php:67
+msgid "Before Add to cart"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:65
+msgid "Archive position"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:66
+msgid "Position of quantity input field and increment buttons in HTML structure of archives. Visual position may be different depending on float. \"After Add to cart\" is the only way to keep all these elements in one line on some themes."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:67
+msgid "After Add to cart"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:70
+msgid "Auto cart columns"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:71
+msgid "Check if you notice buttons overflowing to next column or breaking to next line on the cart page."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:72
+msgid "Auto sizes columns on the cart page. Already used by a vast majority of themes. Alternatively merge buttons and reduce widths to fit into fixed-size column."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:74
+msgid "Merge buttons"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:75
+msgid "Remove space between increment buttons and quantity input field, visually merging these elements."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:76
+#: qty-increment-buttons-for-woocommerce.php:78
+msgid "Center"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:76
+msgid "Cart page align"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:77
+msgid "Horizontal alignment in cart page quantity column. Affects input field and increment buttons. Desktop view only."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:78
+msgid "Left"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:78
+msgid "Right"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:80
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Silver"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:80
+msgid "Button style"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:81
+msgid "Includes button colors (background, font, hover background, focus outline), button styles (focus outline) and quantity input field colors (border). You can adjust this style within your child theme CSS or additional CSS if your theme allows it."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Black"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Blue"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Brown"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Orange"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:82
+msgid "Red"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:84
+msgid "Button height"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:85
+msgid "Recommended 25-40 pixels. Quantity input field and Add to cart button will have the same height."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:87
+msgid "Button width"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:88
+msgid "Recommended 25-40 pixels."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:90
+msgid "Quantity field width"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:91
+msgid "Recommended 35-50 pixels."
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:190
+msgid "Support & suggestions"
+msgstr ""
+
+#: qty-increment-buttons-for-woocommerce.php:192
+msgid "Rate this plugin"
+msgstr ""
