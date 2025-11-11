@@ -61,10 +61,10 @@ class qib_settings {
 			add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'add_settings_link' ] );
 			// Scripts for settings page - dynamically show / hide based on checked options.
 			add_action( 'admin_enqueue_scripts',  [ $this, 'admin_enqueue_scripts' ] );
-			// Display a notice encouraging to rate the plugin if not dismissed.
-			include_once( 'includes/qib-feedback-notice.php' );
+			
 			
 		}
+		add_action('wp_enqueue_scripts', [$this, 'public_enqueue_scripts' ]);
 		
 		$this->settings_list = [
 
@@ -221,9 +221,27 @@ class qib_settings {
 			return;
 		$plugin_slug = 'qty-increment-buttons-for-woocommerce';
 		$plugin_short_slug = 'qty-increment-buttons';	
-		wp_enqueue_script( $plugin_short_slug . '-admin', plugins_url() . '/' . $plugin_slug . '/js/' . $plugin_slug . '-admin' . '.js', [ 'jquery' ], '', true );	
+		wp_enqueue_script( $plugin_short_slug . '-admin', plugins_url('/js/' . $plugin_slug . '-admin' . '.js', __FILE__) , [ 'jquery' ], '', true );
+		wp_enqueue_style( $plugin_short_slug . '-admin', plugins_url('/css/admin-page.css', __FILE__) );
 	}
+		// Remove plugin prefix and dash "_" from argument keys.
+	public function qib_replaceArrayKeys( $array ) {
+		$replacedKeys = str_replace('qib_', '', array_keys( $array ));
+		return array_combine( $replacedKeys, $array );
+	}	
+	public function public_enqueue_scripts ( ) {	
+		$plugin_short_slug = 'qty-increment-buttons';	
+		wp_register_style( 'qty-increment-button', false );
+		wp_enqueue_style( 'qty-increment-button' );
+
+		$args = $this->qib_replaceArrayKeys ( $this->qib_get_settings() );
+
+		wp_add_inline_style( 'qty-increment-button', qib_apply_styles($args));
+		// Enqueue js scripts to make the buttons actually work.
+		wp_enqueue_script( $plugin_short_slug . '-public', plugins_url('/js/public.js', __FILE__) , [ 'jquery' ], '', true );
 	
+	
+	}
 	/**
 	 * Get the option that is saved or the default.
 	 *
@@ -263,7 +281,7 @@ class qib_settings {
 			<div class="qib_admin_links">
 				<a href="https://wordpress.org/support/plugin/qty-increment-buttons-for-woocommerce/" target="_blank"><?php esc_html_e( 'Support & suggestions', 'qty-increment-buttons-for-woocommerce' );?></a>
 				|
-				<a href="https://wordpress.org/support/plugin/qty-increment-buttons-for-woocommerce/reviews/?rate=5#new-post" target="_blank"><?php esc_html_e( 'Rate this plugin', 'qty-increment-buttons-for-woocommerce' );?></a>				
+				<a href="https://wordpress.org/support/plugin/qty-increment-buttons-for-woocommerce/reviews/" target="_blank"><?php esc_html_e( 'Check out our great reviews!', 'qty-increment-buttons-for-woocommerce' );?></a>				
 			</div>
 			<h1>Qty Increment Buttons for WooCommerce</h1>
             <form method="post" action="options.php">
@@ -393,75 +411,7 @@ class qib_settings {
 
 $qib_settingz_page = new qib_settings();
 
-if( is_admin() ) {	
-	
-	// Change plugin settings page CSS.
-	add_action( 'admin_head-settings_page_qty-increment-buttons', 'qib_settings_style' );	
-	function qib_settings_style() {
-		
-		$my_style = '
-		input[type=checkbox], input[type=radio] {
-			margin: -4px 8px 0 0;
-		}
-		input, select {
-			margin: 1px 1px 1px 0;
-		}	
-		.form-table th {
-			padding: 10px 10px 10px 0;
-			width: 150px;
-		}
-		.form-table td {
-			padding: 5px 10px;
-		}
-		.form-table td p {
-			margin-bottom: 6px;
-		}
-		.wrap h1 {		
-			padding: 9px 0;
-		}	
-		.qib_admin_links {
-			float: right;
-			margin: 15px 50px 15px 0;
-			vertical-align: middle;
-		}
-		.qib_sizes input {
-			float: left;
-			width: 35px;
-			text-align: center;	
-		}
-		.qib_sizes p.description {
-			float: left;
-			margin-left: 10px;
-		}
-		.qib_help_tip::after {
-			font-family: dashicons;
-			content:  "\f223";
-			float: right;
-			vertical-align: middle;
-			font-weight: normal;
-		}
-		.qib_help_tip span {	
-			display: none;
-			position: absolute;			
-			left: 162px;
-			margin-top: 7px;
-			padding: 7px;
-			box-sizing: border-box;
-			border: 2px #de930a solid;
-			background-color: #fff6b4;
-			font-size: 13px;
-			font-weight: normal;
-		}
-		.qib_help_tip:hover :nth-child(1){
-			display: block;		
-		}
-		';	
-		
-		echo '<style>' . qib_minify($my_style) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		
-	}
 
-}
 
 // Only if WooCommerce is active (doesn't work for Github installations which have version number in folder name).
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) || ( get_site_option('active_sitewide_plugins') && array_key_exists( 'woocommerce/woocommerce.php', get_site_option('active_sitewide_plugins') ) ) ) {
@@ -482,14 +432,11 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	function qty_increment_buttons( $args ) {
 		
 		if ( $args['all_pages'] != 1 ) {			
-			// Must be a product, cart, checkout, shop or category page.
+			//TODO: work in it Must be a product, cart, checkout, shop or category page. 
 			if (! is_product() && ! is_cart() && ! is_checkout() && ! is_shop() && ! is_product_category()) return;
 		}
 	
-		// Apply plugin styles through CSS in page head.
-		add_action( 'wp_head', function() use ( $args ) { qib_apply_styles( $args ); } );
-		// Enqueue js script inline using wc_enqueue_js to make the buttons actually work.
-		add_action( 'template_redirect', 'qib_enqueue_script' );
+		
 		
 		// Handle archive display options.
 		if ( $args['archive_display'] == 'None' ) return;
@@ -532,8 +479,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			Fusion_Dynamic_JS::deregister_script('avada-quantity');  
 		}		
 			
-		// Add script that allows adding custom quantity on Add to cart button click for archive pages.
-		add_action( 'template_redirect', 'qib_add_to_cart_quantity_handler' );
+		
 	}	
 
 	function qib_quantity_field_archive() {		
@@ -543,28 +489,6 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		}
 	}	
 
-	function qib_add_to_cart_quantity_handler() {
-		
-		wc_enqueue_js( '
-		
-			jQuery(document).on( "click", ".quantity input", function() {
-				return false;
-			});
-			
-			jQuery(document).on( "change input", ".quantity .qty", function() {					
-				
-				var add_to_cart_button = jQuery( this ).closest( ".product" ).find( ".add_to_cart_button" );
-
-				// For AJAX add-to-cart actions				
-				add_to_cart_button.attr( "data-quantity", jQuery( this ).val() );
-
-				// For non-AJAX add-to-cart actions
-				add_to_cart_button.attr( "href", "?add-to-cart=" + add_to_cart_button.attr( "data-product_id" ) + "&quantity=" + jQuery( this ).val() );				
-			});
-			
-		' );
-
-	}
 	
 	add_filter('qib_quantity_template_path', 'qib_template_path');
 	function qib_template_path($template_path) {
@@ -579,76 +503,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		return $template;
 	}
 	
-	function qib_enqueue_script() { 
-		
-		$event_listeners =
-		'		
-		// Make the code work after page load.
-		$(document).ready(function(){			
-			QtyChng();		
-		});
-
-		// Make the code work after executing AJAX.
-		$(document).ajaxComplete(function () {
-			QtyChng();
-		});
-		';
-		
-		$event_listeners = apply_filters( 'qib_change_event_listeners', $event_listeners);
-		
-		$quantity_change =
-		
-		'
-		// Find quantity input field corresponding to increment button clicked.
-		var qty = $( this ).siblings( ".quantity" ).find( ".qty" );
-		// Read value and attributes min, max, step.
-		var val = parseFloat(qty.val());
-		var max = parseFloat(qty.attr( "max" ));
-		var min = parseFloat(qty.attr( "min" ));		
-		var step = parseFloat(qty.attr( "step" ));
-		
-		// Change input field value if result is in min and max range.
-		// If the result is above max then change to max and alert user about exceeding max stock.
-		// If the field is empty, fill with min for "-" (0 possible) and step for "+".
-		if ( $( this ).is( ".plus" ) ) {
-			if ( val === max ) return false;				   
-			if( isNaN(val) ) {
-				qty.val( step );			
-			} else if ( val + step > max ) {
-				qty.val( max );
-			} else {
-				qty.val( val + step );
-			}	   
-		} else {			
-			if ( val === min ) return false;
-			if( isNaN(val) ) {
-				qty.val( min );
-			} else if ( val - step < min ) {
-				qty.val( min );
-			} else {
-				qty.val( val - step );
-			}
-		}
-		
-		qty.val( Math.round( qty.val() * 100 ) / 100 );
-		qty.trigger("change");
-		$( "body" ).removeClass( "sf-input-focused" );
-		';
-		
-		$quantity_change = apply_filters( 'qib_change_quantity_change', $quantity_change);		
 	
-		wc_enqueue_js( $event_listeners .		
-			
-			'
-			function QtyChng() {
-				$(document).off("click", ".qib-button").on( "click", ".qib-button", function() {'				
-					. $quantity_change .					
-				'});
-			}
-			'
-		);
-		
-	}
 	
 	function qib_apply_styles( $args ) {
 
