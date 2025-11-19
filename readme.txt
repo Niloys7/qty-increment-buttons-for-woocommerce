@@ -1,6 +1,6 @@
-=== Qty Increment Buttons for WooCommerce ===
+=== Qty Plus Minus Buttons for WooCommerce ===
 Contributors: im_niloy,taisho
-Tags: woocommerce,quantity,increment,buttons,qty
+Tags: woocommerce,quantity,increment,qty plus minus
 Requires at least: 4.6
 Tested up to: 6.8
 Requires PHP: 5.4
@@ -8,11 +8,11 @@ Stable tag: 2.7.6
 License: GPLv3
 License URL: http://www.gnu.org/licenses/gpl-3.0.html
 
-Adds professionally looking "-" and "+" quantity increment buttons around product quantity field on WooCommerce pages.
+Adds professionally looking "-" and "+" quantity Plus Minus button around product quantity field on WooCommerce pages.
 
 == Description ==
 
-Adds professionally looking "-" and "+" quantity increment buttons around product quantity field on WooCommerce pages. Removes default increment arrows inside this field. Easy customization through plugin settings.
+Adds professionally looking "-" and "+" quantity Plus Minus button around product quantity field on WooCommerce pages. Removes default increment arrows inside this field. Easy customization through plugin settings.
 
 <h4>Features</h4>
 
