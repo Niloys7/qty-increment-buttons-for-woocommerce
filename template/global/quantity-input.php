@@ -33,7 +33,7 @@ if ( $max_value && $min_value === $max_value ) {
 	}
 } else {			
 	/* translators: %s: Quantity. */
-	$label = ! empty( $args['product_name'] ) ? sprintf( __( '%s quantity', 'woocommerce' ), wp_strip_all_tags( $args['product_name'] ) ) : __( 'Quantity', 'woocommerce' );
+	$label = ! empty( $args['product_name'] ) ? sprintf( __( '%s quantity', 'qty-increment-buttons-for-woocommerce' ), wp_strip_all_tags( $args['product_name'] ) ) : __( 'Quantity', 'qty-increment-buttons-for-woocommerce' );
 	?>
 	<div class="qib-container">
 		<button type="button" class="minus qib-button" >-</button>
@@ -48,7 +48,7 @@ if ( $max_value && $min_value === $max_value ) {
 				max="<?php echo esc_attr( 0 < $max_value ? $max_value : '' ); ?>"
 				name="<?php echo esc_attr( $input_name ); ?>"
 				value="<?php echo esc_attr( $input_value ); ?>"
-				title="<?php echo esc_attr_x( 'Qty', 'Product quantity input tooltip', 'woocommerce' ); ?>"
+				title="<?php echo esc_attr_x( 'Qty', 'Product quantity input tooltip', 'qty-increment-buttons-for-woocommerce' ); ?>"
 				size="4"
 				placeholder="<?php echo esc_attr( $placeholder ); ?>"
 				inputmode="<?php echo esc_attr( $inputmode ); ?>" />
